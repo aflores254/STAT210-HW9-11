@@ -1,0 +1,341 @@
+---
+title: "HW9-11"
+author: "Armando F"
+date: "10/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE, 10.1}
+#library(tidyverse)
+```
+
+```{r 10.2}
+as_tibble(iris)
+
+tibble(
+  x = 1:5, 
+  y = 1, 
+  z = x ^ 2 + y
+)
+
+tb <- tibble(
+  `:)` = "smile", 
+  ` ` = "space",
+  `2000` = "number"
+)
+tb
+
+tribble(
+  ~x, ~y, ~z,
+  #--|--|----
+  "a", 2, 3.6,
+  "b", 1, 8.5
+)
+```
+
+```{r 10.3}
+tibble(
+  a = lubridate::now() + runif(1e3) * 86400,
+  b = lubridate::today() + runif(1e3) * 30,
+  c = 1:1e3,
+  d = runif(1e3),
+  e = sample(letters, 1e3, replace = TRUE)
+)
+
+nycflights13::flights %>% 
+  print(n = 10, width = Inf)
+
+nycflights13::flights %>% 
+  View()
+
+df <- tibble(
+  x = runif(5),
+  y = rnorm(5)
+)
+
+# Extract by name
+df$x
+#> [1] 0.434 0.395 0.548 0.762 0.254
+df[["x"]]
+#> [1] 0.434 0.395 0.548 0.762 0.254
+
+# Extract by position
+df[[1]]
+#> [1] 0.434 0.395 0.548 0.762 0.254
+
+df %>% .$x
+#> [1] 0.434 0.395 0.548 0.762 0.254
+df %>% .[["x"]]
+#> [1] 0.434 0.395 0.548 0.762 0.254
+```
+
+```{r 10.4}
+class(as.data.frame(tb))
+#> [1] "data.frame"
+```
+
+```{r 10.5}
+#1 How can you tell if an object is a tibble? (Hint: try printing mtcars, which is a regular data frame).
+as.tibble(mtcars)
+# The difference between a tibble and a regular data frame is that the tibble, is that the tibble simplifies the data frame for easier processing by changing variables into numeric values, while the the regular data frame retains character values. 
+mtcars
+#2 Compare and contrast the following operations on a data.frame and equivalent tibble. What is different? Why might the default data frame behaviours cause you frustration?
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+#3 If you have the name of a variable stored in an object, e.g. var <- "mpg", how can you extract the reference variable from a tibble?
+We can use class(as.data.frame()) to 
+#4 Practice referring to non-syntactic names in the following data frame by:
+
+#4a Extracting the variable called 1.
+annoying1 <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+ df[[1]]
+#4b Plotting a scatterplot of 1 vs 2.
+annoying2 <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+#4c Creating a new column called 3 which is 2 divided by 1.
+annoying3 <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`)),
+  `3` = 2 / 1 
+)
+#4d Renaming the columns to one, two and three.
+annoying4 <- tibble(
+  `a` = 1:10,
+  `b` = `a` * 2 + rnorm(length(`a`)),
+  `c` = 2 / 1
+)
+#5 What does tibble::enframe() do? When might you use it?
+?tibble::enframe
+
+#The enframe converts named atomic vectors or lists into two-column date frames, for unnamed vectors, the natural sequence is ued as the name column. 
+
+#6 What option controls how many additional column names are printed at the footer of a tibble?
+?tibble
+
+#width() option controls how many column names are printed for a tibble.
+```
+
+```{r 11.1}
+#library(tidyverse)
+```
+
+```{r 11.2}
+heights <- read_csv("data/heights.csv")
+
+read_csv("a,b,c
+1,2,3
+4,5,6")
+
+read_csv("The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3", skip = 2)
+
+read_csv("# A comment I want to skip
+  x,y,z
+  1,2,3", comment = "#")
+
+read_csv("1,2,3\n4,5,6", col_names = FALSE)
+
+read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
+
+read_csv("a,b,c\n1,2,.", na = ".")
+```
+
+```{r 11.2.2 Exercises}
+#1 What function would you use to read a file where fields were separated with
+“|”?
+
+#2 Apart from file, skip, and comment, what other arguments do read_csv() and read_tsv() have in common?
+
+#3 What are the most important arguments to read_fwf()?
+
+#4 Sometimes strings in a CSV file contain commas. To prevent them from causing problems they need to be surrounded by a quoting character, like " or '. By convention, read_csv() assumes that the quoting character will be ", and if you want to change it you’ll need to use read_delim() instead. What arguments do you need to specify to read the following text into a data frame?
+
+"x,y\n1,'a,b'"
+#5 Identify what is wrong with each of the following inline CSV files. What happens when you run the code?
+
+read_csv("a,b\n1,2,3\n4,5,6")
+read_csv("a,b,c\n1,2\n1,2,3,4")
+read_csv("a,b\n\"1")
+read_csv("a,b\n1,2\na,b")
+read_csv("a;b\n1;3")
+```
+
+
+```{r 11.3}
+str(parse_logical(c("TRUE", "FALSE", "NA")))
+
+str(parse_integer(c("1", "2", "3")))
+
+str(parse_date(c("2010-01-01", "1979-10-14")))
+
+parse_integer(c("1", "231", ".", "456"), na = ".")
+
+x <- parse_integer(c("123", "345", "abc", "123.45"))
+
+problems(x)
+
+parse_double("1.23")
+
+parse_double("1,23", locale = locale(decimal_mark = ","))
+
+parse_number("$100")
+
+parse_number("20%")
+
+parse_number("It cost $123.45")
+
+parse_number("$123,456,789")
+
+parse_number("123.456.789", locale = locale(grouping_mark = "."))
+
+parse_number("123'456'789", locale = locale(grouping_mark = "'"))
+
+charToRaw("Hadley")
+
+x1 <- "El Ni\xf1o was particularly bad this year"
+x2 <- "\x82\xb1\x82\xf1\x82\xc9\x82\xbf\x82\xcd"
+
+parse_character(x1, locale = locale(encoding = "Latin1"))
+
+parse_character(x2, locale = locale(encoding = "Shift-JIS"))
+
+guess_encoding(charToRaw(x1))
+
+guess_encoding(charToRaw(x2))
+
+fruit <- c("apple", "banana")
+parse_factor(c("apple", "banana", "bananana"), levels = fruit)
+
+parse_datetime("2010-10-01T2010")
+
+parse_datetime("20101010")
+
+parse_date("2010-10-01")
+
+library(hms)
+
+parse_time("01:10 am")
+
+parse_time("20:10:01")
+
+parse_date("01/02/15", "%m/%d/%y")
+
+parse_date("01/02/15", "%d/%m/%y")
+
+parse_date("01/02/15", "%y/%m/%d")
+
+parse_date("1 janvier 2015", "%d %B %Y", locale = locale("fr"))
+
+```
+```{r 11.3.5}
+#1 What are the most important arguments to locale()?
+
+#2 What happens if you try and set decimal_mark and grouping_mark to the same character? What happens to the default value of grouping_mark when you set decimal_mark to “,”? What happens to the default value of decimal_mark when you set the grouping_mark to “.”?
+
+#3 I didn’t discuss the date_format and time_format options to locale(). What do they do? Construct an example that shows when they might be useful.
+
+#4 If you live outside the US, create a new locale object that encapsulates the settings for the types of file you read most commonly.
+
+#5 What’s the difference between read_csv() and read_csv2()?
+
+#6 What are the most common encodings used in Europe? What are the most common encodings used in Asia? Do some googling to find out.
+
+#7 Generate the correct format string to parse each of the following dates and times:
+
+d1 <- "January 1, 2010"
+d2 <- "2015-Mar-07"
+d3 <- "06-Jun-2017"
+d4 <- c("August 19 (2015)", "July 1 (2015)")
+d5 <- "12/30/14" # Dec 30, 2014
+t1 <- "1705"
+t2 <- "11:15:10.12 PM"
+```
+
+
+```{r 11.4}
+guess_parser("2010-10-01")
+
+guess_parser("15:01")
+
+guess_parser(c("TRUE", "FALSE"))
+
+guess_parser(c("1", "5", "9"))
+
+guess_parser(c("12,352,561"))
+
+str(parse_guess("2010-10-10"))
+
+challenge <- read_csv(readr_example("challenge.csv"))
+
+problems(challenge)
+
+challenge <- read_csv(
+  readr_example("challenge.csv"), 
+  col_types = cols(
+    x = col_integer(),
+    y = col_character()
+  )
+)
+
+challenge <- read_csv(
+  readr_example("challenge.csv"), 
+  col_types = cols(
+    x = col_double(),
+    y = col_character()
+  )
+)
+
+tail(challenge)
+
+challenge <- read_csv(
+  readr_example("challenge.csv"), 
+  col_types = cols(
+    x = col_double(),
+    y = col_date()
+  )
+)
+tail(challenge)
+
+challenge2 <- read_csv(readr_example("challenge.csv"), guess_max = 1001)
+
+challenge2
+
+challenge2 <- read_csv(readr_example("challenge.csv"), 
+  col_types = cols(.default = col_character())
+)
+
+df <- tribble(
+  ~x,  ~y,
+  "1", "1.21",
+  "2", "2.32",
+  "3", "4.56"
+)
+df
+
+type_convert(df)
+```
+
+```{r 11.5}
+write_csv(challenge, "challenge.csv")
+
+challenge
+
+write_csv(challenge, "challenge-2.csv")
+read_csv("challenge-2.csv")
+
+write_rds(challenge, "challenge.rds")
+read_rds("challenge.rds")
+
+library(feather)
+write_feather(challenge, "challenge.feather")
+read_feather("challenge.feather")
+```
